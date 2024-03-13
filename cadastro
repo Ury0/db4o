@@ -1,0 +1,132 @@
+package db4oprojeto2;
+import com.db4o.Db4o;
+import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
+import java.util.Scanner;
+public class Db4oProjeto2 {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+       
+       Scanner tela = new Scanner(System.in);
+       String nome;
+       String telefone;
+       boolean sair= true;
+        
+        
+        while(sair){
+            System.out.println("1- inserir");
+            System.out.println("2- alterar");
+            System.out.println("3- deletar");
+            System.out.println("4- pesquisar");
+            System.out.println("5- sair");
+            int var = tela.nextInt();
+            switch (var) {
+            case 1:
+                tela.nextLine();
+                System.out.println("nome:");
+                nome = tela.nextLine();
+                System.out.println("telefone");
+                telefone = tela.nextLine();
+                inserir(nome,telefone);
+                break;
+            case 2:
+                tela.nextLine();
+                System.out.println("nome:");
+                nome = tela.nextLine();
+                System.out.println("telefone");
+                telefone = tela.nextLine();
+                alterar(nome,telefone);
+                break;
+            case 3:
+                tela.nextLine();
+                System.out.println("nome:");
+                nome = tela.nextLine();
+                deletar(nome);
+                break;
+            case 4:
+                tela.nextLine();
+                System.out.println("nome:");
+                nome = tela.nextLine();
+                pesquisar(nome);
+                break;
+            case 5:
+                sair = false;
+                break;
+            default:
+                throw new AssertionError();
+        }
+        
+    }
+         
+}
+    public static void pesquisar(String nome){
+        ObjectContainer db = Db4o.openFile("C:\\Users\\Miétje\\Desktop\\banco\\banco.yap");
+        ObjectSet result = db.queryByExample(new pessoa());
+        pessoa busca[] = new pessoa[result.size()];
+        for(int i=0;i<result.size();i++){
+            busca[i] = (pessoa) result.next();
+            if(nome.equals(busca[i].getNome())){
+                System.out.println(busca[i].getNome());
+                System.out.println(busca[i].getTelefone());
+            }
+        }
+        db.close();
+    }
+    public static void alterar(String nome,String telefone){
+        ObjectContainer db = Db4o.openFile("C:\\Users\\Miétje\\Desktop\\banco\\banco.yap");
+        pessoa p = new pessoa();
+        p.setNome(nome);
+        ObjectSet result = db.queryByExample(new pessoa());
+        pessoa busca[] = new pessoa[result.size()];
+        for(int i = 0;i<result.size();i++){
+            busca[i] = (pessoa) result.next();
+            if(p.getNome().equals(busca[i].getNome())){
+                p.setNome(nome);
+                p.setTelefone(telefone);
+                db.delete(busca[i]);
+                db.store(p);
+                System.out.println(busca[i]+" foi alterado para "+ p);
+                break;
+            }
+        }
+        db.close();
+    }
+    public static void inserir(String nome,String telefone){
+        ObjectContainer db = Db4o.openFile("C:\\Users\\Miétje\\Desktop\\banco\\banco.yap");
+        pessoa p = new pessoa();
+        p.setNome(nome);
+        p.setTelefone(telefone);
+        db.store(p);
+        System.out.println("inserido com sucesso");
+        db.close();
+    }
+    public static void deletar(String nome){
+        ObjectContainer db = Db4o.openFile("C:\\Users\\Miétje\\Desktop\\banco\\banco.yap");
+        pessoa p = new pessoa();
+        p.setNome(nome);
+        ObjectSet result = db.queryByExample(new pessoa());
+        pessoa busca[] = new pessoa[result.size()];
+        for(int i = 0;i<result.size();i++){
+            busca[i] = (pessoa) result.next();
+            if(p.getNome().equals(busca[i].getNome())){
+                db.delete(busca[i]);
+                System.out.println("deletado com sucesso");
+                break;
+            }
+        }
+        db.close();
+    }
+    public static void listar(){
+        ObjectContainer db = Db4o.openFile("C:\\Users\\Miétje\\Desktop\\banco\\banco.yap");
+        ObjectSet result = db.queryByExample(new pessoa());
+        System.out.println("nome/telefone");
+        for(int i =0;i<result.size();i++){
+            System.out.println((pessoa)result.next());
+        }
+        db.close();
+    }
+    
+}
